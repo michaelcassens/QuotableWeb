@@ -144,5 +144,34 @@ namespace QuotableWeb
             return jsonString;
         }
 
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string getRandomQuote()
+        {
+            string jsonString = "";
+            quotes q = null;
+            quotes[] quoteArray = null;
+            SqlParameter[] myParameters = new SqlParameter[1];
+            Random myRand = new Random();
+            myParameters[0] = new SqlParameter("quoteID",myRand.Next(82000,82000+73000));
+      
+            // Type type = quotes.GetType();
+            DataAccess myAccess = new DataAccess();
+            DataSet myDS = myAccess.getQuery("spGetSpecificQuote", myParameters);
+            quoteArray = new quotes[myDS.Tables[0].Rows.Count];
+
+            for (int i = 0; i < myDS.Tables[0].Rows.Count; i++)
+            {
+                q = new quotes(Int32.Parse(myDS.Tables[0].Rows[i]["quoteID"].ToString()), myDS.Tables[0].Rows[i]["quote"].ToString(), myDS.Tables[0].Rows[i]["author"].ToString());
+                quoteArray[i] = q;
+                // using a third party component to create a json object
+                //jsonString += Newtonsoft.Json.JsonConvert.SerializeObject(q);
+
+            }
+            jsonString = "{\"cat\":" + Newtonsoft.Json.JsonConvert.SerializeObject(quoteArray) + "}";
+            return jsonString;
+        }
+
     }
 }
